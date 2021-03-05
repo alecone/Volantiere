@@ -7,19 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B6A493B25E9A2F6004F8056 /* RecentRaspberries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */; };
+		8B6A493E25E9A598004F8056 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493D25E9A598004F8056 /* MainMenu.swift */; };
+		8B8FA0B525F2BA7200E2436F /* TextFieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */; };
+		8BAD3BB425F03E3F0054D013 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BAD3BB325F03E3F0054D013 /* Navigator.swift */; };
 		8BD164C625E6FA28006346B3 /* VolantiereApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164C525E6FA28006346B3 /* VolantiereApp.swift */; };
 		8BD164C825E6FA28006346B3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164C725E6FA28006346B3 /* ContentView.swift */; };
 		8BD164CA25E6FA29006346B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BD164C925E6FA29006346B3 /* Assets.xcassets */; };
 		8BD164CD25E6FA29006346B3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BD164CC25E6FA29006346B3 /* Preview Assets.xcassets */; };
+		8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164D625E6FA61006346B3 /* Raspberry.swift */; };
+		8BD164DB25E6FB0F006346B3 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164DA25E6FB0F006346B3 /* LogInView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentRaspberries.swift; sourceTree = "<group>"; };
+		8B6A493D25E9A598004F8056 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldAlert.swift; sourceTree = "<group>"; };
+		8BAD3BB325F03E3F0054D013 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		8BD164C225E6FA28006346B3 /* Volantiere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Volantiere.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BD164C525E6FA28006346B3 /* VolantiereApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolantiereApp.swift; sourceTree = "<group>"; };
 		8BD164C725E6FA28006346B3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8BD164C925E6FA29006346B3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8BD164CC25E6FA29006346B3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8BD164CE25E6FA29006346B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BD164D625E6FA61006346B3 /* Raspberry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Raspberry.swift; sourceTree = "<group>"; };
+		8BD164DA25E6FB0F006346B3 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +65,8 @@
 			isa = PBXGroup;
 			children = (
 				8BD164C525E6FA28006346B3 /* VolantiereApp.swift */,
-				8BD164C725E6FA28006346B3 /* ContentView.swift */,
+				8BD164D925E6FAF6006346B3 /* Views */,
+				8BD164D525E6FA61006346B3 /* Model */,
 				8BD164C925E6FA29006346B3 /* Assets.xcassets */,
 				8BD164CE25E6FA29006346B3 /* Info.plist */,
 				8BD164CB25E6FA29006346B3 /* Preview Content */,
@@ -67,6 +80,27 @@
 				8BD164CC25E6FA29006346B3 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		8BD164D525E6FA61006346B3 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8BD164D625E6FA61006346B3 /* Raspberry.swift */,
+				8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		8BD164D925E6FAF6006346B3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8BD164C725E6FA28006346B3 /* ContentView.swift */,
+				8BD164DA25E6FB0F006346B3 /* LogInView.swift */,
+				8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */,
+				8B6A493D25E9A598004F8056 /* MainMenu.swift */,
+				8BAD3BB325F03E3F0054D013 /* Navigator.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +172,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B8FA0B525F2BA7200E2436F /* TextFieldAlert.swift in Sources */,
+				8BAD3BB425F03E3F0054D013 /* Navigator.swift in Sources */,
+				8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */,
+				8B6A493E25E9A598004F8056 /* MainMenu.swift in Sources */,
 				8BD164C825E6FA28006346B3 /* ContentView.swift in Sources */,
+				8BD164DB25E6FB0F006346B3 /* LogInView.swift in Sources */,
+				8B6A493B25E9A2F6004F8056 /* RecentRaspberries.swift in Sources */,
 				8BD164C625E6FA28006346B3 /* VolantiereApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

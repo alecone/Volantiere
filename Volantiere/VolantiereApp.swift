@@ -11,7 +11,7 @@ import SwiftUI
 struct VolantiereApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LogInView()
         }
     }
 }
