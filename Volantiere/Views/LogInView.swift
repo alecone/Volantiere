@@ -12,6 +12,7 @@ struct LogInView: View {
     @State private var ip2 = ""
     @State private var ip3 = ""
     @State private var ip4 = ""
+    @State private var IP = ""
     @State var visible = false
     @State var alert = false
     @State var error = ""
@@ -95,16 +96,15 @@ struct LogInView: View {
     }
     
     func connect() -> Void {
-        let IP = ip1 + "." + ip2 + "." + ip3 + "." + ip4
-        let ipOk = validateIpAddress(in: IP)
+        self.IP = ip1 + "." + ip2 + "." + ip3 + "." + ip4
+        let ipOk = validateIpAddress(in: self.IP)
         if ipOk {
-            print("Connect to \(IP)")
+            print("Connect to \(self.IP)")
             // Check if already saved
-            let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: IP)
+            let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: self.IP)
             let saved: Bool = JSONHelper.raspberryAlreadySaved(check: connectedRaspberry)
             if !saved {
                 self.showTextFieldAlert = true
-//                JSONHelper.saveRaspberry(new: connectedRaspberry)
             }
             self.goToMain = true
         } else {
@@ -114,6 +114,12 @@ struct LogInView: View {
     
     func openRecentRaspberries() -> Void {
         print("open recent raspberries")
+        let raspies = JSONHelper.loadRaspberries()
+        for r in raspies {
+            if r.ip == "..." {
+                print("Going to delete it")
+            }
+        }
         self.goToRecents = true
     }
     
@@ -138,14 +144,20 @@ struct LogInView: View {
         return ret
     }
     
-    func askNewRaspName() -> TextFieldAlert {
-        return TextFieldAlert(title: "New Raspberry", message: "MyRaspberry", text: self.$newRaspoName)
+    func nameToSavedReady() -> Void {
+        if self.newRaspoName?.count == 0 {
+            print("Giving default name")
+            self.newRaspoName = "MyRaspberry"
+        }
+        // Save it
+        print("Saving \(self.newRaspoName ?? "") with IP \(self.IP)")
+        let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: self.newRaspoName!, ip: self.IP)
+        JSONHelper.saveRaspberry(new: connectedRaspberry)
     }
     
-//    func createWrongIpAlert() -> Alert {
-//        let button = Alert.Button.default(Text("Prova"), action: {renameError()})
-//        return Alert(title: Text("IP address malformed"), message: Text("IP address seams incorrect, try again!"), dismissButton: button)
-//    }
+    func askNewRaspName() -> TextFieldAlert {
+        return TextFieldAlert(title: "New Raspberry", message: "Give it a name", text: self.$newRaspoName, caller: nameToSavedReady)
+    }
     
     var wrongIpAlert = Alert(title: Text("IP address malformed"), message: Text("IP address seams incorrect, try again!"), dismissButton: .default(Text("OK")))
     
