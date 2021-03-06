@@ -11,6 +11,7 @@
 		8B6A493E25E9A598004F8056 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493D25E9A598004F8056 /* MainMenu.swift */; };
 		8B8FA0B525F2BA7200E2436F /* TextFieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */; };
 		8BAD3BB425F03E3F0054D013 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BAD3BB325F03E3F0054D013 /* Navigator.swift */; };
+		8BB26DFF25F40C7800A8BCE0 /* RaspberryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB26DFE25F40C7800A8BCE0 /* RaspberryRow.swift */; };
 		8BD164C625E6FA28006346B3 /* VolantiereApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164C525E6FA28006346B3 /* VolantiereApp.swift */; };
 		8BD164C825E6FA28006346B3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164C725E6FA28006346B3 /* ContentView.swift */; };
 		8BD164CA25E6FA29006346B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BD164C925E6FA29006346B3 /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 		8B6A493D25E9A598004F8056 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldAlert.swift; sourceTree = "<group>"; };
 		8BAD3BB325F03E3F0054D013 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		8BB26DFE25F40C7800A8BCE0 /* RaspberryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaspberryRow.swift; sourceTree = "<group>"; };
 		8BD164C225E6FA28006346B3 /* Volantiere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Volantiere.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BD164C525E6FA28006346B3 /* VolantiereApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolantiereApp.swift; sourceTree = "<group>"; };
 		8BD164C725E6FA28006346B3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */,
 				8B6A493D25E9A598004F8056 /* MainMenu.swift */,
 				8BAD3BB325F03E3F0054D013 /* Navigator.swift */,
+				8BB26DFE25F40C7800A8BCE0 /* RaspberryRow.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -174,6 +177,7 @@
 			files = (
 				8B8FA0B525F2BA7200E2436F /* TextFieldAlert.swift in Sources */,
 				8BAD3BB425F03E3F0054D013 /* Navigator.swift in Sources */,
+				8BB26DFF25F40C7800A8BCE0 /* RaspberryRow.swift in Sources */,
 				8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */,
 				8B6A493E25E9A598004F8056 /* MainMenu.swift in Sources */,
 				8BD164C825E6FA28006346B3 /* ContentView.swift in Sources */,

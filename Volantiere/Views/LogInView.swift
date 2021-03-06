@@ -8,15 +8,13 @@
 import SwiftUI
 
 struct LogInView: View {
+    @EnvironmentObject var raspberries: Raspberries
+    
     @State private var ip1 = ""
     @State private var ip2 = ""
     @State private var ip3 = ""
     @State private var ip4 = ""
     @State private var IP = ""
-    @State var visible = false
-    @State var alert = false
-    @State var error = ""
-    @State var title = ""
     @State private var goToRecents = false
     @State private var goToMain = false
     @State private var showingAlert = false
@@ -81,12 +79,14 @@ struct LogInView: View {
         })
     }
     
+    /// Unused
     // inout is used in order to change string inside the func
     func validateIp(from ip: inout String?, max length: Int){
         if ip!.count > 3 {
             ip = String(ip!.prefix(length))
         }
     }
+    
     func validate(_ ip: String) -> String {
         var newIp: String = ip
         if ip.count > 3 {
@@ -114,12 +114,6 @@ struct LogInView: View {
     
     func openRecentRaspberries() -> Void {
         print("open recent raspberries")
-        let raspies = JSONHelper.loadRaspberries()
-        for r in raspies {
-            if r.ip == "..." {
-                print("Going to delete it")
-            }
-        }
         self.goToRecents = true
     }
     
@@ -153,6 +147,9 @@ struct LogInView: View {
         print("Saving \(self.newRaspoName ?? "") with IP \(self.IP)")
         let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: self.newRaspoName!, ip: self.IP)
         JSONHelper.saveRaspberry(new: connectedRaspberry)
+        
+        // Update global variable
+        raspberries.raspberries = JSONHelper.loadRaspberries()
     }
     
     func askNewRaspName() -> TextFieldAlert {

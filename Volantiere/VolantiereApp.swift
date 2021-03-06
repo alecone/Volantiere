@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct VolantiereApp: App {
+    @StateObject var raspberries = Raspberries()
+    
     var body: some Scene {
         WindowGroup {
-            LogInView()
+            LogInView().environmentObject(raspberries)
         }
     }
 }

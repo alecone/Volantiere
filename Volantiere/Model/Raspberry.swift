@@ -14,6 +14,10 @@ struct Raspberry: Hashable, Codable, Identifiable {
     var ip: String
 }
 
+class Raspberries: ObservableObject {
+    @Published var raspberries: [Raspberry] = JSONHelper.loadRaspberries()
+}
+
 let fileName: String = "saved_raspberry.json"
 
 /// Helper for saving Raspberry devices into json file
