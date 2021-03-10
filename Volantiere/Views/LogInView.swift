@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LogInView: View {
     @EnvironmentObject var raspberries: Raspberries
+    var socket: TCPClient
     
     @State private var ip1 = ""
     @State private var ip2 = ""
@@ -20,60 +21,70 @@ struct LogInView: View {
     @State private var showingAlert = false
     @State private var showTextFieldAlert = false
     @State private var newRaspoName: String?
+    @State private var showConnecting: Bool = false
+    @State private var showingConnNOK = false
 
     
     var body: some View {
-        VStack {
-            Image("raspberry").resizable().frame(width: 300, height: 300, alignment: .top)
-            
-            Text("VolantiereApp")
-                .font(.title)
-                .fontWeight(.heavy)
-                .foregroundColor(Color("AccentColor"))
-                .multilineTextAlignment(.center)
-                .padding(.top, 15)
-            
-            Text("Raspberry IP address").font(.subheadline).fontWeight(.heavy).foregroundColor(Color("AccentColor")).multilineTextAlignment(.center)
-                .padding(.top, 5)
-            
-            HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
-                TextField("255", text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
-                    self.ip1 = validate(ip1)
+        ZStack {
+            VStack {
+                Image("raspberry").resizable().frame(width: 300, height: 300, alignment: .top)
+                
+                Text("VolantiereApp")
+                    .font(.title)
+                    .fontWeight(.heavy)
+                    .foregroundColor(Color("AccentColor"))
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 15)
+                
+                Text("Raspberry IP address").font(.subheadline).fontWeight(.heavy).foregroundColor(Color("AccentColor")).multilineTextAlignment(.center)
+                    .padding(.top, 5)
+                
+                HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
+                    TextField("255", text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
+                        self.ip1 = validate(ip1)
+                    })
+                    TextField("255", text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
+                            self.ip2 = validate(ip2)
+                        })
+                    TextField("255", text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
+                            self.ip3 = validate(ip3)
+                        })
+                    TextField("255", text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
+                            self.ip4 = validate(ip4)
+                        })
+                }).padding(.vertical, 20).padding(.horizontal, 80)
+                Button(action: {self.connect()}, label: {
+                    HStack{
+                        Text("CONNECT")
+                            .multilineTextAlignment(.center)
+                    }.padding(.horizontal, 70).padding(.vertical, 10)
                 })
-                TextField("255", text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
-                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
-                        self.ip2 = validate(ip2)
-                    })
-                TextField("255", text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
-                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
-                        self.ip3 = validate(ip3)
-                    })
-                TextField("255", text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
-                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
-                        self.ip4 = validate(ip4)
-                    })
-            }).padding(.vertical, 20).padding(.horizontal, 80)
-            Button(action: {self.connect()}, label: {
-                HStack{
-                    Text("CONNECT")
-                        .multilineTextAlignment(.center)
-                }.padding(.horizontal, 70).padding(.vertical, 10)
-            })
-            .background(Color("AccentColor"))
-            .foregroundColor(.white).cornerRadius(35)
-            .alert(isPresented: $showingAlert) {
-                wrongIpAlert
-            }
-            .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
-            Spacer()
-            HStack {
-                Text("Recent Raspberry?")
-                Button(action: self.openRecentRaspberries, label: {
-                    Text("Raspberries").foregroundColor(Color("AccentColor"))
+                .background(Color("AccentColor"))
+                .foregroundColor(.white).cornerRadius(35)
+                .alert(isPresented: $showingAlert) {
+                    wrongIpAlert
+                }
+                .alert(isPresented: $showingConnNOK, content: {
+                    connectionFailed
                 })
+                .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
+                if self.showConnecting {
+                    ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle()).zIndex(/*@START_MENU_TOKEN@*/1.0/*@END_MENU_TOKEN@*/)
+                }
+                Spacer()
+                HStack {
+                    Text("Recent Raspberry?")
+                    Button(action: self.openRecentRaspberries, label: {
+                        Text("Raspberries").foregroundColor(Color("AccentColor"))
+                    })
+                }
             }
-        }
-        .navigate(to: MainMenu(), when: $goToMain)
+        }.zIndex(0)
+        .navigate(to: MainMenu(socket: socket), when: $goToMain)
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries()
         })
@@ -96,17 +107,30 @@ struct LogInView: View {
     }
     
     func connect() -> Void {
+        self.showConnecting = true
         self.IP = ip1 + "." + ip2 + "." + ip3 + "." + ip4
         let ipOk = validateIpAddress(in: self.IP)
         if ipOk {
             print("Connect to \(self.IP)")
+            socket.setAddress(newAddress: self.IP)
+            socket.setPort(newPort: 9001)
+            switch socket.connect(timeout: 10) {
+            case .success:
+                print("Connected 🎉")
+                self.showConnecting = false
+                self.goToMain = true
+                break
+            case .failure(let error):
+                self.showConnecting = false
+                self.showingConnNOK = true
+                print("💩 \(error)")
+            }
             // Check if already saved
             let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: self.IP)
             let saved: Bool = JSONHelper.raspberryAlreadySaved(check: connectedRaspberry)
             if !saved {
                 self.showTextFieldAlert = true
             }
-            self.goToMain = true
         } else {
             self.showingAlert = true
         }
@@ -163,6 +187,6 @@ struct LogInView: View {
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView()
+        LogInView(socket: TCPClient())
     }
 }

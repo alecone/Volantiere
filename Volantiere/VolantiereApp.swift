@@ -10,10 +10,11 @@ import SwiftUI
 @main
 struct VolantiereApp: App {
     @StateObject var raspberries = Raspberries()
+    var socket: TCPClient = TCPClient()
     
     var body: some Scene {
         WindowGroup {
-            LogInView().environmentObject(raspberries)
+            LogInView(socket: socket).environmentObject(raspberries)
         }
     }
 }

@@ -8,24 +8,29 @@
 import SwiftUI
 
 struct MainMenu: View {
-    @State private var goToLogIn = false
+    
+    var socket: TCPClient
+    
     var body: some View {
-        NavigationView {
-            Text("MainMenu")
-                .toolbar {
-                    Button(action: {
-                        print("Going to disconnect from server and try go go to LogInView")
-                        goToLogIn = true
-                    }) {
-                        Image(systemName: "pip.exit")
-                    }
-                }
+        Button(action: {
+            print("Going to connect")
+        }) {
+            Image(systemName: "pip.exit")
         }
+        ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle())
+    }
+}
+
+struct DarkBlueShadowProgressViewStyle: ProgressViewStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ProgressView(configuration)
+            .shadow(color: Color(red: 0, green: 0, blue: 0.6),
+                    radius: 4.0, x: 1.0, y: 2.0)
     }
 }
 
 struct MainMenu_Previews: PreviewProvider {
     static var previews: some View {
-        MainMenu()
+        MainMenu(socket: TCPClient())
     }
 }
