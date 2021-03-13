@@ -20,7 +20,7 @@ struct RaspberryRow: View {
     var body: some View {
         HStack {
             Button(action: {}, label: {
-                Text(raspberry.ip)
+                Text(raspberry.ip).bold()
             })
             .onTapGesture(perform: setIPFromRecent)
             Spacer()
