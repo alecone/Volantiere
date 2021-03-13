@@ -17,7 +17,6 @@ struct MainMenu: View {
         }) {
             Image(systemName: "pip.exit")
         }
-        ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle())
     }
 }
 

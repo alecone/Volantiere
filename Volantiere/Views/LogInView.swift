@@ -9,13 +9,13 @@ import SwiftUI
 
 struct LogInView: View {
     @EnvironmentObject var raspberries: Raspberries
+    @EnvironmentObject var IP: GlobalIP
     var socket: TCPClient
     
     @State private var ip1 = ""
     @State private var ip2 = ""
     @State private var ip3 = ""
     @State private var ip4 = ""
-    @State private var IP = ""
     @State private var goToRecents = false
     @State private var goToMain = false
     @State private var showingAlert = false
@@ -41,18 +41,18 @@ struct LogInView: View {
                     .padding(.top, 5)
                 
                 HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
-                    TextField("255", text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[0]), text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
                         self.ip1 = validate(ip1)
                     })
-                    TextField("255", text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[1]), text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
                         .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
                             self.ip2 = validate(ip2)
                         })
-                    TextField("255", text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[2]), text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
                         .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
                             self.ip3 = validate(ip3)
                         })
-                    TextField("255", text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[3]), text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
                         .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
                             self.ip4 = validate(ip4)
                         })
@@ -63,6 +63,7 @@ struct LogInView: View {
                             .multilineTextAlignment(.center)
                     }.padding(.horizontal, 70).padding(.vertical, 10)
                 })
+                .disabled(self.showConnecting)
                 .background(Color("AccentColor"))
                 .foregroundColor(.white).cornerRadius(35)
                 .alert(isPresented: $showingAlert) {
@@ -81,12 +82,13 @@ struct LogInView: View {
                     Button(action: self.openRecentRaspberries, label: {
                         Text("Raspberries").foregroundColor(Color("AccentColor"))
                     })
+                    .disabled(self.showConnecting)
                 }
             }
         }.zIndex(0)
         .navigate(to: MainMenu(socket: socket), when: $goToMain)
         .sheet(isPresented: $goToRecents, content: {
-            RecentRaspberries()
+            RecentRaspberries(isPresented: $goToRecents)
         })
     }
     
@@ -107,12 +109,17 @@ struct LogInView: View {
     }
     
     func connect() -> Void {
+        print("Connecting to \(IP.ip)")
         self.showConnecting = true
-        self.IP = ip1 + "." + ip2 + "." + ip3 + "." + ip4
-        let ipOk = validateIpAddress(in: self.IP)
+        if !IP.loaded {
+            IP.ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4
+        } else {
+            // Reset flag
+            IP.loaded = false
+        }
+        let ipOk = validateIpAddress(in: IP.ip)
         if ipOk {
-            print("Connect to \(self.IP)")
-            socket.setAddress(newAddress: self.IP)
+            socket.setAddress(newAddress: IP.ip)
             socket.setPort(newPort: 9001)
             switch socket.connect(timeout: 10) {
             case .success:
@@ -126,7 +133,7 @@ struct LogInView: View {
                 print("💩 \(error)")
             }
             // Check if already saved
-            let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: self.IP)
+            let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: IP.ip)
             let saved: Bool = JSONHelper.raspberryAlreadySaved(check: connectedRaspberry)
             if !saved {
                 self.showTextFieldAlert = true
@@ -169,7 +176,7 @@ struct LogInView: View {
         }
         // Save it
         print("Saving \(self.newRaspoName ?? "") with IP \(self.IP)")
-        let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: self.newRaspoName!, ip: self.IP)
+        let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: self.newRaspoName!, ip: IP.ip)
         JSONHelper.saveRaspberry(new: connectedRaspberry)
         
         // Update global variable

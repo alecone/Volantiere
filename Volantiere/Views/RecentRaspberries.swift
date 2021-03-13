@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RecentRaspberries: View {
+    @Binding var isPresented: Bool
     @EnvironmentObject var raspberries: Raspberries
     
     var body: some View {
@@ -15,7 +16,7 @@ struct RecentRaspberries: View {
             List {
                 ForEach(raspberries.raspberries) { name in
                     Section(header: Text(name.name)) {
-                        RaspberryRow(raspberry: name)
+                        RaspberryRow(isPresented: $isPresented, raspberry: name)
                     }
                 }
             }
@@ -25,8 +26,8 @@ struct RecentRaspberries: View {
     }
 }
 
-struct RecentRaspberries_Previews: PreviewProvider {
-    static var previews: some View {
-        RecentRaspberries()
-    }
-}
+//struct RecentRaspberries_Previews: PreviewProvider {
+//    static var previews: some View {
+//        RecentRaspberries()
+//    }
+//}
