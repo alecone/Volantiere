@@ -21,11 +21,6 @@ struct MainMenu: View {
     @State var speed: Double = 0
     
     var body: some View {
-        let g = DragGesture(minimumDistance: 0, coordinateSpace: .local).onChanged({
-                    print("DOWN: \($0)")
-                }).onEnded({
-                    print("UP: \($0)")
-                })
         ScrollView(.vertical) {
             VStack {
                 // Stay active toggle
@@ -33,24 +28,22 @@ struct MainMenu: View {
                     Spacer()
                     Toggle(isOn: $isStayActive) {
                         Text("Stay Active").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
-                    }.toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
-                    if isStayActive {
-                        // Send stay active
-                    } else {
-                        // Send Bus sleep
                     }
+                    .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
+                    .onReceive([self.isStayActive].publisher.first()) { (value) in
+                        sendStayActive(isOn: self.isStayActive)
+                       }
                 }.padding()
                 // Key status toggle
                 HStack {
                     Spacer()
                     Toggle(isOn: $isKeyOn) {
                         Text("Key Status").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
-                    }.toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
-                    if isKeyOn {
-                        // Send key on
-                    } else {
-                        // Send Key off
                     }
+                    .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
+                    .onReceive([self.isKeyOn].publisher.first()) { (value) in
+                        sendKeyStatus(isOn: self.isKeyOn)
+                       }
                 }.padding(.horizontal)
                 // All other buttons and touchpad
                 HStack {
@@ -98,7 +91,14 @@ struct MainMenu: View {
                                 .foregroundColor(.white)
                                 .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
                                 .font(.title2)
-                        }).gesture(g)
+                                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local).onChanged({_ in
+                                    startSendingVR()
+                                }).onEnded({_ in
+                                    stopSendingVR()
+                                }))
+                        }).onTapGesture {
+                            
+                        }
                         Button(action: {sendViewMax()}, label: {
                             Image(systemName: "light.max")
                                 .padding()
@@ -156,17 +156,17 @@ struct MainMenu: View {
     
     func sendStayActive(isOn active: Bool) -> Void {
         if active {
-            
+            print("Stay active ON")
         } else {
-            
+            print("Stay active OFF")
         }
     }
     
     func sendKeyStatus(isOn key: Bool) -> Void {
         if key {
-            
+            print("Key ON")
         } else {
-            
+            print("Key OFF")
         }
     }
     
@@ -215,6 +215,13 @@ struct MainMenu: View {
     
     func onSpeedChanged(_ changed: Bool) -> Void {
         print("Speed \(changed ? "changed" : "not changed") to \(speed)")
+    }
+    
+    func startSendingVR() -> Void {
+        print("Start sending VR")
+    }
+    func stopSendingVR() -> Void {
+        print("Stop sendig VR")
     }
 }
 
