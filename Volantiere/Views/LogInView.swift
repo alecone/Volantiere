@@ -109,6 +109,7 @@ struct LogInView: View {
     }
     
     func connect() -> Void {
+        self.showConnecting = true
         if !IP.loaded {
             IP.ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4
         } else {
@@ -118,7 +119,6 @@ struct LogInView: View {
         let ipOk = validateIpAddress(in: IP.ip)
         if ipOk {
             print("Connecting to \(IP.ip)")
-            self.showConnecting = true
             socket.setAddress(newAddress: IP.ip)
             socket.setPort(newPort: 9001)
             switch socket.connect(timeout: 10) {
@@ -141,6 +141,7 @@ struct LogInView: View {
         } else {
             print("Showing alert for bad connection")
             self.showingAlert = true
+            self.showConnecting = false
         }
     }
     
