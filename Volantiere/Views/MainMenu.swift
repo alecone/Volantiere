@@ -21,135 +21,149 @@ struct MainMenu: View {
     @State var speed: Double = 0
     
     var body: some View {
-        VStack {
-            // Stay active toggle
-            HStack {
-                Spacer()
-                Toggle(isOn: $isStayActive) {
-                    Text("Stay Active").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
-                }.toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
-                if isStayActive {
-                    // Send stay active
-                } else {
-                    // Send Bus sleep
-                }
-            }.padding()
-            // Key status toggle
-            HStack {
-                Spacer()
-                Toggle(isOn: $isKeyOn) {
-                    Text("Key Status").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
-                }.toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
-                if isKeyOn {
-                    // Send key on
-                } else {
-                    // Send Key off
-                }
-            }.padding()
-            // All other buttons and touchpad
-            HStack {
-                // First column of items: volume buttons
-                VStack {
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "speaker.wave.3.fill")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "speaker.wave.1.fill")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "speaker.slash.fill")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                }
-                // Second column of items: phone, vr, max
-                VStack {
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "phone.fill")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "mic.fill")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "light.max")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                }
-                // Third column of items: phone, vr, max
-                VStack {
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "music.note")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Image(systemName: "thermometer.snowflake")
-                            .padding()
-                            .background(Color("AccentColor"))
-                            .foregroundColor(.white)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .font(.title2)
-                    })
-                }
-                Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                    Image(systemName: "arrowshape.turn.up.backward.fill")
-                        .padding()
-                        .background(Color("AccentColor"))
-                        .foregroundColor(.white)
-                        .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                        .font(.title2)
+        let g = DragGesture(minimumDistance: 0, coordinateSpace: .local).onChanged({
+                    print("DOWN: \($0)")
+                }).onEnded({
+                    print("UP: \($0)")
                 })
-            }.padding()
+        ScrollView(.vertical) {
             VStack {
-                Image("bg-kv")
-                    .resizable()
-                    .frame(width: 201, height: 295, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-            }.padding()
-            Spacer()
-            HStack {
-                Image(systemName: "speedometer")
-                    .foregroundColor(Color("AccentColor"))
-                    .font(.title2)
-                Slider(value: $speed, in: 0...500, step: 1, onEditingChanged: onSpeedChanged(_:))
-                Text("\(Int(speed)) km/h")
-                    .foregroundColor(Color("AccentColor"))
-                    .font(.title2)
-            }.padding()
+                // Stay active toggle
+                HStack {
+                    Spacer()
+                    Toggle(isOn: $isStayActive) {
+                        Text("Stay Active").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
+                    }.toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
+                    if isStayActive {
+                        // Send stay active
+                    } else {
+                        // Send Bus sleep
+                    }
+                }.padding()
+                // Key status toggle
+                HStack {
+                    Spacer()
+                    Toggle(isOn: $isKeyOn) {
+                        Text("Key Status").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
+                    }.toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
+                    if isKeyOn {
+                        // Send key on
+                    } else {
+                        // Send Key off
+                    }
+                }.padding(.horizontal)
+                // All other buttons and touchpad
+                HStack {
+                    // First column of items: volume buttons
+                    VStack {
+                        Button(action: {sendVolume(direction: .up)}, label: {
+                            Image(systemName: "speaker.wave.3.fill")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                        Button(action: {sendVolume(direction: .down)}, label: {
+                            Image(systemName: "speaker.wave.1.fill")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                        Button(action: {sendVolume(direction: .mute)}, label: {
+                            Image(systemName: "speaker.slash.fill")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                    }
+                    // Second column of items: phone, vr, max
+                    VStack {
+                        Button(action: {sendPhone()}, label: {
+                            Image(systemName: "phone.fill")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                        Button(action: {}, label: {
+                            Image(systemName: "mic.fill")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        }).gesture(g)
+                        Button(action: {sendViewMax()}, label: {
+                            Image(systemName: "light.max")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                    }
+                    // Third column of items: phone, vr, max
+                    VStack {
+                        Button(action: {sendMediaSorce()}, label: {
+                            Image(systemName: "music.note")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                        Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
+                            Image(systemName: "thermometer.snowflake")
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                .font(.title2)
+                        })
+                    }
+                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
+                        Image(systemName: "arrowshape.turn.up.backward.fill")
+                            .padding()
+                            .background(Color("AccentColor"))
+                            .foregroundColor(.white)
+                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                            .font(.title2)
+                    })
+                }.padding()
+                VStack {
+                    Image("bg-kv")
+                        .resizable()
+                        .frame(width: 201, height: 295, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                }
+                HStack {
+                    Image(systemName: "speedometer")
+                        .foregroundColor(Color("AccentColor"))
+                        .font(.title2)
+                    Slider(value: $speed, in: 0...500, step: 1, onEditingChanged: onSpeedChanged(_:))
+                    Text("\(Int(speed)) km/h")
+                        .foregroundColor(Color("AccentColor"))
+                        .font(.title2)
+                }.padding()
+            }
         }
     }
     
     func sendStayActive(isOn active: Bool) -> Void {
         if active {
+            
+        } else {
+            
+        }
+    }
+    
+    func sendKeyStatus(isOn key: Bool) -> Void {
+        if key {
             
         } else {
             
@@ -183,6 +197,22 @@ struct MainMenu: View {
         print("Send View Max")
     }
     
+    func sendMediaSorce() -> Void {
+        
+    }
+    
+    func sendClima() -> Void {
+        
+    }
+    
+    func sendBack(pressure upDown: Bool) -> Void {
+        if upDown {
+            print("Back press")
+        } else {
+            print("Back release")
+        }
+    }
+    
     func onSpeedChanged(_ changed: Bool) -> Void {
         print("Speed \(changed ? "changed" : "not changed") to \(speed)")
     }
@@ -198,6 +228,10 @@ struct DarkBlueShadowProgressViewStyle: ProgressViewStyle {
 
 struct MainMenu_Previews: PreviewProvider {
     static var previews: some View {
-        MainMenu(socket: TCPClient())
+        Group {
+            MainMenu(socket: TCPClient())
+                .preferredColorScheme(.dark)
+                
+        }
     }
 }
