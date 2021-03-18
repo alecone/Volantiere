@@ -15,27 +15,27 @@ enum volumeDirection {
 
 enum messages: String {
     // Feedback messages
-    case OK = "OK"
-    case NOK = "NOK"
+    case OK = "OK|"
+    case NOK = "NOK|"
     // Main function
-    case ACTIVE = "ACTIVE"
-    case NOT_ACTIVE = "NOTACTIVE"
-    case KEY_ON = "KEYON"
-    case KEY_OFF = "KEYOFF"
-    case VOL_UP = "VOLUP"
-    case VOL_DOWN = "VOLDW"
-    case MUTE = "MUTE"
-    case PHONE = "PHONE"
-    case VR_DOWN = "VRDOWN"
-    case VR_UP = "VRUP"
-    case MAX = "MAX"
-    case SOURCE = "SOURCE"
-    case CLIMA = "CLIMA"
-    case BACK_DOWN = "BACKDOWN"
-    case BACK_UP = "BACKUP"
+    case ACTIVE = "ACTIVE|"
+    case NOT_ACTIVE = "NOTACTIVE|"
+    case KEY_ON = "KEYON|"
+    case KEY_OFF = "KEYOFF|"
+    case VOL_UP = "VOLUP|"
+    case VOL_DOWN = "VOLDW|"
+    case MUTE = "MUTE|"
+    case PHONE = "PHONE|"
+    case VR_DOWN = "VRDOWN|"
+    case VR_UP = "VRUP|"
+    case MAX = "MAX|"
+    case SOURCE = "SOURCE|"
+    case CLIMA = "CLIMA|"
+    case BACK_DOWN = "BACKDOWN|"
+    case BACK_UP = "BACKUP|"
     case SPEED = "SPEED_"
     // TouchPad
-    case OKBTN = "OKBTN"
+    case OKBTN = "OKBTN|"
     case DRAGON = "DRAGON_"
     case DRAGOFF = "DRAGOFF_"
 }
@@ -69,22 +69,20 @@ extension DispatchQueue {
     
     static func sendToServer(socket: TCPClient, message: String, feedback: ((Bool) -> Void)? = nil) {
         print("Sending to server: \(message)")
-        var ok: Bool = true
+        var ok: Bool = false
         DispatchQueue.global(qos: .background).async {
             let result = socket.send(string: message)
             switch result {
             case .success:
-                print("Sent. asking feedback")
-                guard let data = socket.read(8) else { return }
-                
+                guard let data = socket.read(Int(socket.bytesAvailable() ?? 32)) else { break }
+                print("Read \(data.count)")
                 if let response = String(bytes: data, encoding: .utf8) {
-                    if response != "OK" {
-                        ok = false
+                    if response == "OK" {
+                        ok = true
                     }
                 }
             case .failure(let error):
                 print(error)
-                ok = false
             }
             if let feedback = feedback {
                 DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
@@ -103,6 +101,9 @@ struct MainMenu: View {
     @State var speed: Double = 0
     @State var isVrPressed: Bool = false
     @State var isBackPressed: Bool = false
+    let scalingFactor: Double = 0.75
+    let touchPadWidth: Double = 256
+    let touchPadHeight: Double = 384
     
     var body: some View {
         VStack {
@@ -194,7 +195,7 @@ struct MainMenu: View {
                             .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
                             .font(.title2)
                     })
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
+                    Button(action: {sendClima()}, label: {
                         Image(systemName: "thermometer.snowflake")
                             .padding()
                             .background(Color("AccentColor"))
@@ -231,7 +232,7 @@ struct MainMenu: View {
                 VStack {
                     Image("bg-kv")
                         .resizable()
-                        .frame(width: 201, height: 295, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                        .frame(width: CGFloat(touchPadWidth*scalingFactor), height: CGFloat(touchPadHeight*scalingFactor), alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
                         .highPriorityGesture(DragGesture(minimumDistance: 10, coordinateSpace: .local).onChanged({gest in
                             onTouchPadEvent(in: gest.location, isEnded: false)
                         }).onEnded({ gest in
@@ -245,20 +246,16 @@ struct MainMenu: View {
     
     func sendStayActive(isOn active: Bool) -> Void {
         if active {
-            print("Stay active ON")
             DispatchQueue.sendToServer(socket: socket, message: messages.ACTIVE.rawValue, feedback: feedbackFromServer)
         } else {
-            print("Stay active OFF")
             DispatchQueue.sendToServer(socket: socket, message: messages.NOT_ACTIVE.rawValue, feedback: feedbackFromServer)
         }
     }
     
     func sendKeyStatus(isOn key: Bool) -> Void {
         if key {
-            print("Key ON")
             DispatchQueue.sendToServer(socket: socket, message: messages.KEY_ON.rawValue, feedback: feedbackFromServer)
         } else {
-            print("Key OFF")
             DispatchQueue.sendToServer(socket: socket, message: messages.KEY_OFF.rawValue, feedback: feedbackFromServer)
         }
     }
@@ -266,24 +263,19 @@ struct MainMenu: View {
     func sendVolume(direction volume: volumeDirection) -> Void {
         switch volume {
         case .up:
-            print("Volume up")
             DispatchQueue.sendToServer(socket: socket, message: messages.VOL_UP.rawValue, feedback: feedbackFromServer)
         case .down:
-            print("Volume down")
             DispatchQueue.sendToServer(socket: socket, message: messages.VOL_DOWN.rawValue, feedback: feedbackFromServer)
         case .mute:
-            print("Mute")
             DispatchQueue.sendToServer(socket: socket, message: messages.MUTE.rawValue, feedback: feedbackFromServer)
         }
     }
     
     func sendPhone() -> Void {
-        print("Send phone button")
         DispatchQueue.sendToServer(socket: socket, message: messages.PHONE.rawValue, feedback: feedbackFromServer)
     }
     
     func sendViewMax() -> Void {
-        print("Send View Max")
         DispatchQueue.sendToServer(socket: socket, message: messages.MAX.rawValue, feedback: feedbackFromServer)
     }
     
@@ -297,43 +289,52 @@ struct MainMenu: View {
     
     func sendBack(pressure upDown: Bool) -> Void {
         if upDown {
-            print("Back press")
             if !self.isBackPressed {
                 DispatchQueue.sendToServer(socket: socket, message: messages.BACK_DOWN.rawValue, feedback: feedbackFromServer)
             }
             self.isBackPressed = true
         } else {
-            print("Back release")
             DispatchQueue.sendToServer(socket: socket, message: messages.BACK_UP.rawValue, feedback: feedbackFromServer)
             self.isBackPressed = false
         }
     }
     
     func onSpeedChanged(_ changed: Bool) -> Void {
-        print("Speed \(changed ? "changed" : "not changed") to \(speed)")
-        let mex: String = messages.SPEED.rawValue + String(Int(speed))
+        let mex: String = messages.SPEED.rawValue + String(Int(speed)) + "|"
         DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
     }
     
     func startSendingVR() -> Void {
-        print("Start sending VR")
         if !self.isVrPressed {
             DispatchQueue.sendToServer(socket: socket, message: messages.VR_DOWN.rawValue, feedback: feedbackFromServer)
         }
         self.isVrPressed = true
     }
     func stopSendingVR() -> Void {
-        print("Stop sendig VR")
         self.isVrPressed = false
         DispatchQueue.sendToServer(socket: socket, message: messages.VR_UP.rawValue, feedback: feedbackFromServer)
     }
     
+    func normalizeFingerPosition(in position: CGPoint) -> CGPoint {
+        var normalizedPosition: CGPoint = position
+        
+        normalizedPosition.x = normalizedPosition.x / CGFloat(scalingFactor)
+        normalizedPosition.y = normalizedPosition.y / CGFloat(scalingFactor)
+        normalizedPosition.x = normalizedPosition.x < 0 ? 0 : normalizedPosition.x
+        normalizedPosition.y = normalizedPosition.y < 0 ? 0 : normalizedPosition.y
+        normalizedPosition.x = normalizedPosition.x > CGFloat(touchPadWidth) ? CGFloat(touchPadWidth) : normalizedPosition.x
+        normalizedPosition.y = normalizedPosition.y > CGFloat(touchPadHeight) ? CGFloat(touchPadHeight) : normalizedPosition.y
+        
+        return normalizedPosition
+    }
+    
     func onTouchPadEvent(in position: CGPoint, isEnded end: Bool) -> Void {
+        let normalizedPosition: CGPoint = normalizeFingerPosition(in: position)
         if end {
-            let mex = messages.DRAGOFF.rawValue + String(Int(position.x)) + "_" + String(Int(position.y))
+            let mex = messages.DRAGOFF.rawValue + String(Int(normalizedPosition.x)) + "_" + String(Int(normalizedPosition.y)) + "|"
             DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
         } else {
-            let mex = messages.DRAGON.rawValue + String(Int(position.x)) + "_" + String(Int(position.y))
+            let mex = messages.DRAGON.rawValue + String(Int(normalizedPosition.x)) + "_" + String(Int(normalizedPosition.y)) + "|"
             DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
         }
     }
