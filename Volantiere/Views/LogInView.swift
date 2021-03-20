@@ -15,6 +15,30 @@ extension View {
 }
 #endif
 
+extension DispatchQueue {
+
+    static func connectToServer(socket: TCPClient, ip: String, feedback: ((Bool) -> Void)? = nil) {
+        print("Connecting to: \(ip)")
+        var ok: Bool = false
+        DispatchQueue.global(qos: .background).async {
+            socket.setAddress(newAddress: ip)
+            socket.setPort(newPort: 9001)
+            let result = socket.connect(timeout: 10)
+            switch result {
+            case .success:
+                ok = true
+            case .failure(let error):
+                print(error)
+            }
+            if let feedback = feedback {
+                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
+                    feedback(ok)
+                })
+            }
+        }
+    }
+}
+
 struct LogInView: View {
     @EnvironmentObject var raspberries: Raspberries
     @EnvironmentObject var IP: GlobalIP
@@ -34,78 +58,81 @@ struct LogInView: View {
     
     
     var body: some View {
-        ZStack {
-            VStack {
-                Image("raspberry").resizable().frame(width: 300, height: 300, alignment: .top)
-                
-                Text("VolantiereApp")
-                    .font(.title)
-                    .fontWeight(.heavy)
-                    .foregroundColor(Color("AccentColor"))
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 15)
-                
-                Text("Raspberry IP address").font(.subheadline).fontWeight(.heavy).foregroundColor(Color("AccentColor")).multilineTextAlignment(.center)
-                    .padding(.top, 5)
-                
-                HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
-                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[0]), text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
-                        self.ip1 = validate(ip1)
-                    })
-                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[1]), text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
-                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
-                            self.ip2 = validate(ip2)
-                        })
-                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[2]), text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
-                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
-                            self.ip3 = validate(ip3)
-                        })
-                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[3]), text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
-                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
-                            self.ip4 = validate(ip4)
-                        })
-                }).padding(.vertical, 20).padding(.horizontal, 80)
-                Button(action: {self.connect()}, label: {
-                    HStack{
-                        Text("CONNECT")
-                            .multilineTextAlignment(.center)
-                    }.padding(.horizontal, 70).padding(.vertical, 10)
-                })
-                .disabled(self.showConnecting)
-                .background(Color("AccentColor"))
-                .foregroundColor(.white).cornerRadius(35)
-                .alert(isPresented: $showingAlert) {
-                    wrongIpAlert
-                }
-                .alert(isPresented: $showingConnNOK, content: {
-                    connectionFailed
-                })
-                .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
-                if self.showConnecting {
-                    ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle()).zIndex(/*@START_MENU_TOKEN@*/1.0/*@END_MENU_TOKEN@*/)
-                }
-                Spacer()
-                HStack {
-                    Text("Recent Raspberry?")
-                    Button(action: self.openRecentRaspberries, label: {
-                        Text("Raspberries").foregroundColor(Color("AccentColor"))
+        VStack {
+            Image("raspberry").resizable().frame(width: 300, height: 300, alignment: .top)
+            
+            Text("VolantiereApp")
+                .font(.title)
+                .fontWeight(.heavy)
+                .foregroundColor(Color("AccentColor"))
+                .multilineTextAlignment(.center)
+                .padding(.top, 15)
+            
+            Text("Raspberry IP address").font(.subheadline).fontWeight(.heavy).foregroundColor(Color("AccentColor")).multilineTextAlignment(.center)
+                .padding(.top, 5)
+            
+            HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
+                TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[0]), text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
+                    self.ip1 = validate(ip1)
                     })
                     .disabled(self.showConnecting)
-                }.padding()
+                TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[1]), text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
+                        self.ip2 = validate(ip2)
+                    })
+                    .disabled(self.showConnecting)
+                TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[2]), text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
+                        self.ip3 = validate(ip3)
+                    })
+                    .disabled(self.showConnecting)
+                TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[3]), text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
+                    .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
+                        self.ip4 = validate(ip4)
+                    })
+                    .disabled(self.showConnecting)
+            }).padding(.vertical, 20).padding(.horizontal, 80)
+            Button(action: {self.connect()}, label: {
+                HStack{
+                    Text("CONNECT")
+                        .multilineTextAlignment(.center)
+                }.padding(.horizontal, 70).padding(.vertical, 10)
+            })
+            .disabled(self.showConnecting)
+            .background(Color("AccentColor"))
+            .foregroundColor(.white).cornerRadius(35)
+            Spacer()
+            if self.showConnecting {
+                ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle()).padding()
             }
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 50)
-                    .onEnded { _ in
-                        hideKeyboard()
-                    }
-            )
+            Spacer()
+            HStack {
+                Text("Recent Raspberry?")
+                Button(action: self.openRecentRaspberries, label: {
+                    Text("Raspberries").foregroundColor(Color("AccentColor"))
+                })
+                .disabled(self.showConnecting)
+            }.padding()
         }
-        .zIndex(0)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 50)
+                .onEnded { _ in
+                    hideKeyboard()
+                }
+        )
         .navigate(to: MainMenu(socket: socket), when: $goToMain)
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries(isPresented: $goToRecents)
         })
+        .alert(isPresented: $showingAlert, content: {
+            wrongIpAlert
+        })
+        .alert(isPresented: $showingConnNOK, content: {
+            connectionFailed
+        })
+        .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
     }
     
     /// Unused
@@ -124,8 +151,23 @@ struct LogInView: View {
         return newIp
     }
     
+    func connectionFeedback(connection result: Bool) -> Void {
+        self.showConnecting = false
+        if result {
+            print("Connected 🎉")
+            //self.goToMain = true
+            // Check if already saved
+            let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: IP.ip)
+            let saved: Bool = JSONHelper.raspberryAlreadySaved(check: connectedRaspberry)
+            if !saved {
+                self.showTextFieldAlert = true
+            }
+        }
+        else {
+            self.showingConnNOK = true
+        }
+    }
     func connect() -> Void {
-        self.showConnecting = true
         if !IP.loaded {
             IP.ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4
         } else {
@@ -134,30 +176,11 @@ struct LogInView: View {
         }
         let ipOk = validateIpAddress(in: IP.ip)
         if ipOk {
-            print("Connecting to \(IP.ip)")
-            socket.setAddress(newAddress: IP.ip)
-            socket.setPort(newPort: 9001)
-            switch socket.connect(timeout: 10) {
-            case .success:
-                print("Connected 🎉")
-                self.showConnecting = false
-                self.goToMain = true
-                break
-            case .failure(let error):
-                self.showConnecting = false
-                self.showingConnNOK = true
-                print("💩 \(error)")
-            }
-            // Check if already saved
-            let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: IP.ip)
-            let saved: Bool = JSONHelper.raspberryAlreadySaved(check: connectedRaspberry)
-            if !saved {
-                self.showTextFieldAlert = true
-            }
+            self.showConnecting = true
+            DispatchQueue.connectToServer(socket: self.socket, ip: IP.ip, feedback: self.connectionFeedback)
         } else {
             print("Showing alert for bad connection")
             self.showingAlert = true
-            self.showConnecting = false
         }
     }
     
@@ -205,7 +228,7 @@ struct LogInView: View {
         return TextFieldAlert(title: "New Raspberry", message: "Give it a name", text: self.$newRaspoName, caller: nameToSavedReady)
     }
     
-    var wrongIpAlert = Alert(title: Text("IP address malformed"), message: Text("IP address seams incorrect, try again!"), dismissButton: .default(Text("OK")))
+    var wrongIpAlert = Alert(title: Text("IP address malformed"), message: Text("Try again!"), dismissButton: .default(Text("OK")))
     
     var connectionFailed = Alert(title: Text("Connection Failed"), message: Text("Connection error"), dismissButton: .default(Text("OK")))
 }
