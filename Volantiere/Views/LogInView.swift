@@ -211,14 +211,12 @@ struct LogInView: View {
             self.showConnecting = true
             DispatchQueue.connectToServer(socket: self.socket, ip: IP.ip, feedback: self.connectionFeedback)
         } else {
-            print("Showing alert for bad connection")
             self.activeAlert = .ipNOK
             self.showingAlert = true
         }
     }
     
     func openRecentRaspberries() -> Void {
-        print("open recent raspberries")
         self.goToRecents = true
     }
     
