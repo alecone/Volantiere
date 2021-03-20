@@ -78,7 +78,7 @@ struct LogInView: View {
     @State private var ip3 = ""
     @State private var ip4 = ""
     @State private var goToRecents = false
-    @State private var goToMain = false
+    @State private var goToNitView = false
     @State private var showingAlert = false
     @State private var showTextFieldAlert = false
     @State private var newRaspoName: String?
@@ -131,6 +131,15 @@ struct LogInView: View {
             .disabled(self.showConnecting)
             .background(Color("AccentColor"))
             .foregroundColor(.white).cornerRadius(35)
+            .alert(isPresented: $showingAlert) {
+                switch activeAlert {
+                case .ipNOK:
+                    return Alert(title: Text("IP address malformed"), message: Text("Try again!"), dismissButton: .default(Text("OK")))
+                case .connectKO:
+                    return Alert(title: Text("Connection Failed"), message: Text("Connection error"), dismissButton: .default(Text("OK")))
+                }
+            }
+            .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
             Spacer()
             if self.showConnecting {
                 ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle()).padding()
@@ -151,19 +160,10 @@ struct LogInView: View {
                     hideKeyboard()
                 }
         )
-        .navigate(to: MainMenu(socket: socket), when: $goToMain)
+        .navigate(to: NitView(socket: socket), when: $goToNitView)
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries(isPresented: $goToRecents)
         })
-        .alert(isPresented: $showingAlert) {
-            switch activeAlert {
-            case .ipNOK:
-                return Alert(title: Text("IP address malformed"), message: Text("Try again!"), dismissButton: .default(Text("OK")))
-            case .connectKO:
-                return Alert(title: Text("Connection Failed"), message: Text("Connection error"), dismissButton: .default(Text("OK")))
-            }
-        }
-        .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
     }
     
     /// Unused

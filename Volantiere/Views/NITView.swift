@@ -82,7 +82,7 @@ extension DispatchQueue {
     }
 }
 
-struct MainMenu: View {
+struct NitView: View {
     
     var socket: TCPClient
     @State var isStayActive: Bool = false
@@ -348,7 +348,7 @@ struct DarkBlueShadowProgressViewStyle: ProgressViewStyle {
 struct MainMenu_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            MainMenu(socket: TCPClient())
+            NitView(socket: TCPClient())
                 .preferredColorScheme(.dark)
                 
         }
