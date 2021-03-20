@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+#endif
+
 struct LogInView: View {
     @EnvironmentObject var raspberries: Raspberries
     @EnvironmentObject var IP: GlobalIP
@@ -23,71 +31,77 @@ struct LogInView: View {
     @State private var newRaspoName: String?
     @State private var showConnecting: Bool = false
     @State private var showingConnNOK = false
-
+    
     
     var body: some View {
         ZStack {
-            ScrollView {
-                VStack {
-                    Image("raspberry").resizable().frame(width: 300, height: 300, alignment: .top)
-                    
-                    Text("VolantiereApp")
-                        .font(.title)
-                        .fontWeight(.heavy)
-                        .foregroundColor(Color("AccentColor"))
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 15)
-                    
-                    Text("Raspberry IP address").font(.subheadline).fontWeight(.heavy).foregroundColor(Color("AccentColor")).multilineTextAlignment(.center)
-                        .padding(.top, 5)
-                    
-                    HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
-                        TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[0]), text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
-                            self.ip1 = validate(ip1)
+            VStack {
+                Image("raspberry").resizable().frame(width: 300, height: 300, alignment: .top)
+                
+                Text("VolantiereApp")
+                    .font(.title)
+                    .fontWeight(.heavy)
+                    .foregroundColor(Color("AccentColor"))
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 15)
+                
+                Text("Raspberry IP address").font(.subheadline).fontWeight(.heavy).foregroundColor(Color("AccentColor")).multilineTextAlignment(.center)
+                    .padding(.top, 5)
+                
+                HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10.0, content: {
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[0]), text: self.$ip1).keyboardType(.numberPad).multilineTextAlignment(.center).textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip1, perform: { value in
+                        self.ip1 = validate(ip1)
+                    })
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[1]), text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
+                            self.ip2 = validate(ip2)
                         })
-                        TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[1]), text: self.$ip2).keyboardType(.numberPad).multilineTextAlignment(.center)
-                            .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip2, perform: { value in
-                                self.ip2 = validate(ip2)
-                            })
-                        TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[2]), text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
-                            .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
-                                self.ip3 = validate(ip3)
-                            })
-                        TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[3]), text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
-                            .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
-                                self.ip4 = validate(ip4)
-                            })
-                    }).padding(.vertical, 20).padding(.horizontal, 80)
-                    Button(action: {self.connect()}, label: {
-                        HStack{
-                            Text("CONNECT")
-                                .multilineTextAlignment(.center)
-                        }.padding(.horizontal, 70).padding(.vertical, 10)
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[2]), text: self.$ip3).keyboardType(.numberPad).multilineTextAlignment(.center)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip3, perform: { value in
+                            self.ip3 = validate(ip3)
+                        })
+                    TextField(IP.ip.split(separator: ".").count == 0 ? "255" : String(IP.ip.split(separator: ".")[3]), text: self.$ip4).keyboardType(.numberPad).multilineTextAlignment(.center)
+                        .textFieldStyle(RoundedBorderTextFieldStyle()).onChange(of: ip4, perform: { value in
+                            self.ip4 = validate(ip4)
+                        })
+                }).padding(.vertical, 20).padding(.horizontal, 80)
+                Button(action: {self.connect()}, label: {
+                    HStack{
+                        Text("CONNECT")
+                            .multilineTextAlignment(.center)
+                    }.padding(.horizontal, 70).padding(.vertical, 10)
+                })
+                .disabled(self.showConnecting)
+                .background(Color("AccentColor"))
+                .foregroundColor(.white).cornerRadius(35)
+                .alert(isPresented: $showingAlert) {
+                    wrongIpAlert
+                }
+                .alert(isPresented: $showingConnNOK, content: {
+                    connectionFailed
+                })
+                .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
+                if self.showConnecting {
+                    ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle()).zIndex(/*@START_MENU_TOKEN@*/1.0/*@END_MENU_TOKEN@*/)
+                }
+                Spacer()
+                HStack {
+                    Text("Recent Raspberry?")
+                    Button(action: self.openRecentRaspberries, label: {
+                        Text("Raspberries").foregroundColor(Color("AccentColor"))
                     })
                     .disabled(self.showConnecting)
-                    .background(Color("AccentColor"))
-                    .foregroundColor(.white).cornerRadius(35)
-                    .alert(isPresented: $showingAlert) {
-                        wrongIpAlert
-                    }
-                    .alert(isPresented: $showingConnNOK, content: {
-                        connectionFailed
-                    })
-                    .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
-                    if self.showConnecting {
-                        ProgressView().progressViewStyle(DarkBlueShadowProgressViewStyle()).zIndex(/*@START_MENU_TOKEN@*/1.0/*@END_MENU_TOKEN@*/)
-                    }
-                    Spacer()
-                    HStack {
-                        Text("Recent Raspberry?")
-                        Button(action: self.openRecentRaspberries, label: {
-                            Text("Raspberries").foregroundColor(Color("AccentColor"))
-                        })
-                        .disabled(self.showConnecting)
-                    }.padding()
-                }
+                }.padding()
             }
-        }.zIndex(0)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 50)
+                    .onEnded { _ in
+                        hideKeyboard()
+                    }
+            )
+        }
+        .zIndex(0)
         .navigate(to: MainMenu(socket: socket), when: $goToMain)
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries(isPresented: $goToRecents)
