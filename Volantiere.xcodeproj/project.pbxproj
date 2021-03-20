@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B4AC0B82606769D0081D271 /* LICUView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4AC0B72606769D0081D271 /* LICUView.swift */; };
 		8B6A493B25E9A2F6004F8056 /* RecentRaspberries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */; };
 		8B6A493E25E9A598004F8056 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493D25E9A598004F8056 /* MainMenu.swift */; };
 		8B8FA0B525F2BA7200E2436F /* TextFieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8B4AC0B72606769D0081D271 /* LICUView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LICUView.swift; sourceTree = "<group>"; };
 		8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentRaspberries.swift; sourceTree = "<group>"; };
 		8B6A493D25E9A598004F8056 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldAlert.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				8B6A493D25E9A598004F8056 /* MainMenu.swift */,
 				8BAD3BB325F03E3F0054D013 /* Navigator.swift */,
 				8BB26DFE25F40C7800A8BCE0 /* RaspberryRow.swift */,
+				8B4AC0B72606769D0081D271 /* LICUView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -199,6 +202,7 @@
 				8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */,
 				8B6A493E25E9A598004F8056 /* MainMenu.swift in Sources */,
 				8BA3DFA425F8302700AFD387 /* TCPClient.swift in Sources */,
+				8B4AC0B82606769D0081D271 /* LICUView.swift in Sources */,
 				8BA3DFA725F8302700AFD387 /* Socket.swift in Sources */,
 				8BD164DB25E6FB0F006346B3 /* LogInView.swift in Sources */,
 				8B6A493B25E9A2F6004F8056 /* RecentRaspberries.swift in Sources */,
