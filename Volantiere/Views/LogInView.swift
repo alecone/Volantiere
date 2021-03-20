@@ -37,6 +37,35 @@ extension DispatchQueue {
             }
         }
     }
+    
+    static func checkServerType(socket: TCPClient, feedback: ((String) -> Void)? = nil) {
+        var hostType: String = "ERRO"
+        DispatchQueue.global(qos: .background).async {
+            let ask: String = "GETHOSTTYPE|"
+            let result = socket.send(string: ask)
+            switch result {
+            case .success:
+                guard let data = socket.read(Int(socket.bytesAvailable() ?? 32)) else { break }
+                print("Read \(data.count)")
+                if let response = String(bytes: data, encoding: .utf8) {
+                    if response != "NULL" {
+                        hostType = response
+                    }
+                }
+            case .failure(let error):
+                print(error)
+            }
+            if let feedback = feedback {
+                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
+                    feedback(hostType)
+                })
+            }
+        }
+    }
+}
+
+enum ActiveAlert {
+    case ipNOK, connectKO
 }
 
 struct LogInView: View {
@@ -54,7 +83,7 @@ struct LogInView: View {
     @State private var showTextFieldAlert = false
     @State private var newRaspoName: String?
     @State private var showConnecting: Bool = false
-    @State private var showingConnNOK = false
+    @State private var activeAlert: ActiveAlert = .ipNOK
     
     
     var body: some View {
@@ -126,12 +155,14 @@ struct LogInView: View {
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries(isPresented: $goToRecents)
         })
-        .alert(isPresented: $showingAlert, content: {
-            wrongIpAlert
-        })
-        .alert(isPresented: $showingConnNOK, content: {
-            connectionFailed
-        })
+        .alert(isPresented: $showingAlert) {
+            switch activeAlert {
+            case .ipNOK:
+                return Alert(title: Text("IP address malformed"), message: Text("Try again!"), dismissButton: .default(Text("OK")))
+            case .connectKO:
+                return Alert(title: Text("Connection Failed"), message: Text("Connection error"), dismissButton: .default(Text("OK")))
+            }
+        }
         .textFieldAlert(isPresented: $showTextFieldAlert, content: askNewRaspName)
     }
     
@@ -164,7 +195,8 @@ struct LogInView: View {
             }
         }
         else {
-            self.showingConnNOK = true
+            self.activeAlert = .connectKO
+            self.showingAlert = true
         }
     }
     func connect() -> Void {
@@ -180,6 +212,7 @@ struct LogInView: View {
             DispatchQueue.connectToServer(socket: self.socket, ip: IP.ip, feedback: self.connectionFeedback)
         } else {
             print("Showing alert for bad connection")
+            self.activeAlert = .ipNOK
             self.showingAlert = true
         }
     }
@@ -227,10 +260,6 @@ struct LogInView: View {
     func askNewRaspName() -> TextFieldAlert {
         return TextFieldAlert(title: "New Raspberry", message: "Give it a name", text: self.$newRaspoName, caller: nameToSavedReady)
     }
-    
-    var wrongIpAlert = Alert(title: Text("IP address malformed"), message: Text("Try again!"), dismissButton: .default(Text("OK")))
-    
-    var connectionFailed = Alert(title: Text("Connection Failed"), message: Text("Connection error"), dismissButton: .default(Text("OK")))
 }
 
 struct LogInView_Previews: PreviewProvider {
