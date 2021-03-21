@@ -7,39 +7,6 @@
 
 import SwiftUI
 
-enum volumeDirection {
-    case up
-    case down
-    case mute
-}
-
-enum messages: String {
-    // Feedback messages
-    case OK = "OK|"
-    case NOK = "NOK|"
-    // Main function
-    case ACTIVE = "ACTIVE|"
-    case NOT_ACTIVE = "NOTACTIVE|"
-    case KEY_ON = "KEYON|"
-    case KEY_OFF = "KEYOFF|"
-    case VOL_UP = "VOLUP|"
-    case VOL_DOWN = "VOLDW|"
-    case MUTE = "MUTE|"
-    case PHONE = "PHONE|"
-    case VR_DOWN = "VRDOWN|"
-    case VR_UP = "VRUP|"
-    case MAX = "MAX|"
-    case SOURCE = "SOURCE|"
-    case CLIMA = "CLIMA|"
-    case BACK_DOWN = "BACKDOWN|"
-    case BACK_UP = "BACKUP|"
-    case SPEED = "SPEED_"
-    // TouchPad
-    case OKBTN = "OKBTN|"
-    case DRAGON = "DRAGON_"
-    case DRAGOFF = "DRAGOFF_"
-}
-
 extension Binding {
     func didSet(execute: @escaping (Value) -> Void) -> Binding {
         return Binding(
@@ -54,37 +21,11 @@ extension Binding {
     }
 }
 
-extension DispatchQueue {
-    
-    static func sendToServer(socket: TCPClient, message: String, feedback: ((Bool) -> Void)? = nil) {
-        print("Sending to server: \(message)")
-        var ok: Bool = false
-        DispatchQueue.global(qos: .background).async {
-            let result = socket.send(string: message)
-            switch result {
-            case .success:
-                guard let data = socket.read(Int(socket.bytesAvailable() ?? 32)) else { break }
-                print("Read \(data.count)")
-                if let response = String(bytes: data, encoding: .utf8) {
-                    if response == "OK" {
-                        ok = true
-                    }
-                }
-            case .failure(let error):
-                print(error)
-            }
-            if let feedback = feedback {
-                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-                    feedback(ok)
-                })
-            }
-        }
-    }
-}
-
 struct NitView: View {
     
     var socket: TCPClient
+    var messageHandler: MessageHandler
+    
     @State var isStayActive: Bool = false
     @State var isKeyOn: Bool = false
     @State var speed: Double = 0
@@ -230,78 +171,83 @@ struct NitView: View {
                         .onTapGesture(perform: sendOk)
                 }
             }
-        }
+        }.onAppear(perform: setMessageHandler)
+    }
+    
+    func setMessageHandler() -> Void {
+        messageHandler.setFeedbackFunc(feedback: feedbackFromServer)
+        messageHandler.startThread()
     }
     
     func sendStayActive(isOn active: Bool) -> Void {
         if active {
-            DispatchQueue.sendToServer(socket: socket, message: messages.ACTIVE.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.ACTIVE.rawValue)
         } else {
-            DispatchQueue.sendToServer(socket: socket, message: messages.NOT_ACTIVE.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.NOT_ACTIVE.rawValue)
         }
     }
     
     func sendKeyStatus(isOn key: Bool) -> Void {
         if key {
-            DispatchQueue.sendToServer(socket: socket, message: messages.KEY_ON.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.KEY_ON.rawValue)
         } else {
-            DispatchQueue.sendToServer(socket: socket, message: messages.KEY_OFF.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.KEY_OFF.rawValue)
         }
     }
     
     func sendVolume(direction volume: volumeDirection) -> Void {
         switch volume {
         case .up:
-            DispatchQueue.sendToServer(socket: socket, message: messages.VOL_UP.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.VOL_UP.rawValue)
         case .down:
-            DispatchQueue.sendToServer(socket: socket, message: messages.VOL_DOWN.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.VOL_DOWN.rawValue)
         case .mute:
-            DispatchQueue.sendToServer(socket: socket, message: messages.MUTE.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.MUTE.rawValue)
         }
     }
     
     func sendPhone() -> Void {
-        DispatchQueue.sendToServer(socket: socket, message: messages.PHONE.rawValue, feedback: feedbackFromServer)
+        addMessageToQueue(add: messages.PHONE.rawValue)
     }
     
     func sendViewMax() -> Void {
-        DispatchQueue.sendToServer(socket: socket, message: messages.MAX.rawValue, feedback: feedbackFromServer)
+        addMessageToQueue(add: messages.MAX.rawValue)
     }
     
     func sendMediaSorce() -> Void {
-        DispatchQueue.sendToServer(socket: socket, message: messages.SOURCE.rawValue, feedback: feedbackFromServer)
+        addMessageToQueue(add: messages.SOURCE.rawValue)
     }
     
     func sendClima() -> Void {
-        DispatchQueue.sendToServer(socket: socket, message: messages.CLIMA.rawValue, feedback: feedbackFromServer)
+        addMessageToQueue(add: messages.CLIMA.rawValue)
     }
     
     func sendBack(pressure upDown: Bool) -> Void {
         if upDown {
             if !self.isBackPressed {
-                DispatchQueue.sendToServer(socket: socket, message: messages.BACK_DOWN.rawValue, feedback: feedbackFromServer)
+                addMessageToQueue(add: messages.BACK_DOWN.rawValue)
             }
             self.isBackPressed = true
         } else {
-            DispatchQueue.sendToServer(socket: socket, message: messages.BACK_UP.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.BACK_UP.rawValue)
             self.isBackPressed = false
         }
     }
     
     func onSpeedChanged(_ changed: Bool) -> Void {
-        let mex: String = messages.SPEED.rawValue + String(Int(speed)) + "|"
-        DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
+        let mex: String = messages.SPEED.rawValue + String(Int(speed))
+        addMessageToQueue(add: mex)
     }
     
     func startSendingVR() -> Void {
         if !self.isVrPressed {
-            DispatchQueue.sendToServer(socket: socket, message: messages.VR_DOWN.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.VR_DOWN.rawValue)
         }
         self.isVrPressed = true
     }
     func stopSendingVR() -> Void {
         self.isVrPressed = false
-        DispatchQueue.sendToServer(socket: socket, message: messages.VR_UP.rawValue, feedback: feedbackFromServer)
+        addMessageToQueue(add: messages.VR_UP.rawValue)
     }
     
     func normalizeFingerPosition(in position: CGPoint) -> CGPoint {
@@ -320,20 +266,24 @@ struct NitView: View {
     func onTouchPadEvent(in position: CGPoint, isEnded end: Bool) -> Void {
         let normalizedPosition: CGPoint = normalizeFingerPosition(in: position)
         if end {
-            let mex = messages.DRAGOFF.rawValue + String(Int(normalizedPosition.x)) + "_" + String(Int(normalizedPosition.y)) + "|"
-            DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
+            let mex = messages.DRAGOFF.rawValue + String(Int(normalizedPosition.x)) + "_" + String(Int(normalizedPosition.y))
+            addMessageToQueue(add: mex)
         } else {
-            let mex = messages.DRAGON.rawValue + String(Int(normalizedPosition.x)) + "_" + String(Int(normalizedPosition.y)) + "|"
-            DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
+            let mex = messages.DRAGON.rawValue + String(Int(normalizedPosition.x)) + "_" + String(Int(normalizedPosition.y))
+            addMessageToQueue(add: mex)
         }
     }
     func sendOk() -> Void {
         print("OK")
-        DispatchQueue.sendToServer(socket: socket, message: messages.OKBTN.rawValue, feedback: feedbackFromServer)
+        addMessageToQueue(add: messages.OKBTN.rawValue)
     }
     
-    func feedbackFromServer(received ok: Bool) -> Void {
-        print("Received feedback \(ok ? "OK" : "NOK")")
+    func feedbackFromServer(received ok: String) -> Void {
+        print("Received feedback \(ok)")
+    }
+    
+    func addMessageToQueue(add message: String) -> Void {
+        messageHandler.postMessage(message)
     }
 }
 
@@ -348,7 +298,7 @@ struct DarkBlueShadowProgressViewStyle: ProgressViewStyle {
 struct MainMenu_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NitView(socket: TCPClient())
+            NitView(socket: TCPClient(), messageHandler: MessageHandler(socket: TCPClient()))
                 .preferredColorScheme(.dark)
                 
         }

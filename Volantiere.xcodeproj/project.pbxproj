@@ -22,6 +22,7 @@
 		8BD164CD25E6FA29006346B3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BD164CC25E6FA29006346B3 /* Preview Assets.xcassets */; };
 		8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164D625E6FA61006346B3 /* Raspberry.swift */; };
 		8BD164DB25E6FB0F006346B3 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD164DA25E6FB0F006346B3 /* LogInView.swift */; };
+		8BD48AAC26079CAD00CBE562 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD48AAB26079CAD00CBE562 /* Common.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		8BD164CE25E6FA29006346B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8BD164D625E6FA61006346B3 /* Raspberry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Raspberry.swift; sourceTree = "<group>"; };
 		8BD164DA25E6FB0F006346B3 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
+		8BD48AAB26079CAD00CBE562 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 			children = (
 				8BD164D625E6FA61006346B3 /* Raspberry.swift */,
 				8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */,
+				8BD48AAB26079CAD00CBE562 /* Common.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -202,6 +205,7 @@
 				8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */,
 				8B6A493E25E9A598004F8056 /* NitView.swift in Sources */,
 				8BA3DFA425F8302700AFD387 /* TCPClient.swift in Sources */,
+				8BD48AAC26079CAD00CBE562 /* Common.swift in Sources */,
 				8B4AC0B82606769D0081D271 /* LicuView.swift in Sources */,
 				8BA3DFA725F8302700AFD387 /* Socket.swift in Sources */,
 				8BD164DB25E6FB0F006346B3 /* LogInView.swift in Sources */,

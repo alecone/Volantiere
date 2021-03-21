@@ -7,67 +7,6 @@
 
 import SwiftUI
 
-#if canImport(UIKit)
-extension View {
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-}
-#endif
-
-extension DispatchQueue {
-
-    static func connectToServer(socket: TCPClient, ip: String, feedback: ((Bool) -> Void)? = nil) {
-        print("Connecting to: \(ip)")
-        var ok: Bool = false
-        DispatchQueue.global(qos: .background).async {
-            socket.setAddress(newAddress: ip)
-            socket.setPort(newPort: 9001)
-            let result = socket.connect(timeout: 10)
-            switch result {
-            case .success:
-                ok = true
-            case .failure(let error):
-                print(error)
-            }
-            if let feedback = feedback {
-                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-                    feedback(ok)
-                })
-            }
-        }
-    }
-    
-    static func checkServerType(socket: TCPClient, feedback: ((String) -> Void)? = nil) {
-        var hostType: String = "ERRO"
-        DispatchQueue.global(qos: .background).async {
-            let ask: String = "GETHOSTTYPE|"
-            let result = socket.send(string: ask)
-            switch result {
-            case .success:
-                guard let data = socket.read(Int(socket.bytesAvailable() ?? 32)) else { break }
-                print("Read \(data.count)")
-                if let response = String(bytes: data, encoding: .utf8) {
-                    if response != "NULL" {
-                        hostType = response
-                    }
-                }
-            case .failure(let error):
-                print(error)
-            }
-            if let feedback = feedback {
-                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-                    feedback(hostType)
-                })
-            }
-        }
-    }
-}
-
-enum ActiveAlert {
-    case ipNOK, connectKO
-}
-
 struct LogInView: View {
     @EnvironmentObject var raspberries: Raspberries
     @EnvironmentObject var IP: GlobalIP
@@ -161,8 +100,8 @@ struct LogInView: View {
                     hideKeyboard()
                 }
         )
-        .navigate(to: LicuView(socket: socket), when: $goToLicuView)
-        .navigate(to: NitView(socket: socket), when: $goToNitView)
+        .navigate(to: LicuView(socket: socket, messageHandler: MessageHandler(socket: socket)), when: $goToLicuView)
+        .navigate(to: NitView(socket: socket, messageHandler: MessageHandler(socket: socket)), when: $goToNitView)
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries(isPresented: $goToRecents)
         })
@@ -186,10 +125,10 @@ struct LogInView: View {
     
     func serverTypeFeedback(target type: String) -> Void {
         switch type {
-        case "LICU":
+        case messages.LICU.rawValue:
             self.goToNitView = false
             self.goToLicuView = true
-        case "NIT":
+        case messages.NIT.rawValue:
             self.goToNitView = true
             self.goToLicuView = false
         default:

@@ -20,7 +20,9 @@ struct VolantiereApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LogInView(socket: socket).environmentObject(raspberries).environmentObject(IP)
+            LogInView(socket: socket)
+                .environmentObject(raspberries)
+                .environmentObject(IP)
         }
     }
 }

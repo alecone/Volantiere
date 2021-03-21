@@ -7,13 +7,20 @@
 
 import SwiftUI
 
-enum gear {
-    case R, P, N, One, Two, Three, Four, Five, Six, Seven
+#if canImport(UIKit)
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
+#endif
+
 
 struct LicuView: View {
     
     var socket: TCPClient
+    var messageHandler: MessageHandler
+    
     @State var isHandBreakOn: Bool = true
     @State var isKeyOn: Bool = false
     @State var isHeadLightsOn: Bool = false
@@ -48,11 +55,11 @@ struct LicuView: View {
                     .foregroundColor(Color("AccentColor"))
                     .font(.title2)
             }.padding()
+            .disabled(!self.isKeyOn)
             // Gear botton
             HStack {
                 // First column of items: volume buttons
                 Image(systemName: "gearshape.2.fill")
-                    .padding()
                     .foregroundColor(Color("AccentColor"))
                     .font(.title2)
                 VStack {
@@ -71,7 +78,7 @@ struct LicuView: View {
                         buildGearButton(gear: .Seven, lable: "7")
                     }
                 }
-            }.padding()
+            }.padding(.vertical)
             // Headlights toggle
             HStack {
                 Spacer()
@@ -79,9 +86,16 @@ struct LicuView: View {
                     Text("Head lights").italic().foregroundColor(Color("AccentColor")).fontWeight(.semibold)
                 }
                 .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
-            }.padding()
+            }
+            .padding()
+            .disabled(!self.isKeyOn)
             Spacer()
-        }
+        }.onAppear(perform: setMessageHandler)
+    }
+    
+    func setMessageHandler() -> Void {
+        messageHandler.setFeedbackFunc(feedback: feedbackFromServer)
+        messageHandler.startThread()
     }
     
     func buildGearButton(gear: gear, lable: String) -> some View {
@@ -89,51 +103,84 @@ struct LicuView: View {
             HStack{
                 Text(lable)
                     .multilineTextAlignment(.center)
-            }.padding(.horizontal, 15).padding(.vertical, 10)
+            }.padding(.horizontal, 10).padding(.vertical, 5)
         })
         .disabled(!self.isKeyOn)
         .background(Color("AccentColor"))
         .foregroundColor(.white).cornerRadius(50)
-        .scaleEffect((self.currentGear == gear) ? 1.4 : 0.8)
+        .scaleEffect((self.currentGear == gear) ? 1.5 : 0.8)
     }
     
     func sendHBActive(isOn active: Bool) -> Void {
         if active {
-            DispatchQueue.sendToServer(socket: socket, message: messages.ACTIVE.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.EPB_ON.rawValue)
         } else {
-            DispatchQueue.sendToServer(socket: socket, message: messages.NOT_ACTIVE.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.EPB_OFF.rawValue)
         }
     }
     
     func sendKeyStatus(isOn key: Bool) -> Void {
         if key {
-            DispatchQueue.sendToServer(socket: socket, message: messages.KEY_ON.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.KEY_ON.rawValue)
         } else {
-            DispatchQueue.sendToServer(socket: socket, message: messages.KEY_OFF.rawValue, feedback: feedbackFromServer)
+            addMessageToQueue(add: messages.KEY_OFF.rawValue)
         }
     }
     
     func onSpeedChanged(_ changed: Bool) -> Void {
-        let mex: String = messages.SPEED.rawValue + String(Int(speed)) + "|"
-        DispatchQueue.sendToServer(socket: socket, message: mex, feedback: feedbackFromServer)
+        let mex: String = messages.SPEED.rawValue + String(Int(speed))
+        addMessageToQueue(add: mex)
     }
     
     func sendGear(position gear: gear) -> Void {
         self.currentGear = gear
+        let sGear: String
+        switch gear {
+        case .R:
+            sGear = "R"
+        case .P:
+            sGear = "P"
+        case .N:
+            sGear = "N"
+        case .One:
+            sGear = "1"
+        case .Two:
+            sGear = "2"
+        case .Three:
+            sGear = "3"
+        case .Four:
+            sGear = "4"
+        case .Five:
+            sGear = "5"
+        case .Six:
+            sGear = "6"
+        case .Seven:
+            sGear = "7"
+        }
+        let mex = messages.GEAR.rawValue + sGear
+        addMessageToQueue(add: mex)
     }
     
     func sendHeadsLight(isOn lights: Bool) -> Void {
-        
+        if lights {
+            addMessageToQueue(add: messages.LIGHT_ON.rawValue)
+        } else {
+            addMessageToQueue(add: messages.LIGHT_OFF.rawValue)
+        }
     }
     
-    func feedbackFromServer(received ok: Bool) -> Void {
-        print("Received feedback \(ok ? "OK" : "NOK")")
+    func feedbackFromServer(received ok: String) -> Void {
+        print("Received feedback \(ok)")
+    }
+    
+    func addMessageToQueue(add message: String) -> Void {
+        messageHandler.postMessage(message)
     }
 }
 
 struct LicuView_Previews: PreviewProvider {
     static var previews: some View {
-        LicuView(socket: TCPClient())
+        LicuView(socket: TCPClient(), messageHandler: MessageHandler(socket: TCPClient()))
     }
 }
 
