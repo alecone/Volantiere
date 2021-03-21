@@ -79,6 +79,7 @@ struct LogInView: View {
     @State private var ip4 = ""
     @State private var goToRecents = false
     @State private var goToNitView = false
+    @State private var goToLicuView = false
     @State private var showingAlert = false
     @State private var showTextFieldAlert = false
     @State private var newRaspoName: String?
@@ -160,6 +161,7 @@ struct LogInView: View {
                     hideKeyboard()
                 }
         )
+        .navigate(to: LicuView(socket: socket), when: $goToLicuView)
         .navigate(to: NitView(socket: socket), when: $goToNitView)
         .sheet(isPresented: $goToRecents, content: {
             RecentRaspberries(isPresented: $goToRecents)
@@ -182,17 +184,31 @@ struct LogInView: View {
         return newIp
     }
     
+    func serverTypeFeedback(target type: String) -> Void {
+        switch type {
+        case "LICU":
+            self.goToNitView = false
+            self.goToLicuView = true
+        case "NIT":
+            self.goToNitView = true
+            self.goToLicuView = false
+        default:
+            print("Unknown host type received: \(type)")
+            // By default clean up all variables -> TODO
+        }
+    }
+    
     func connectionFeedback(connection result: Bool) -> Void {
         self.showConnecting = false
         if result {
             print("Connected 🎉")
-            //self.goToMain = true
             // Check if already saved
             let connectedRaspberry: Raspberry = Raspberry(id: UUID(), name: "", ip: IP.ip)
             let saved: Bool = JSONHelper.raspberryAlreadySaved(check: connectedRaspberry)
             if !saved {
                 self.showTextFieldAlert = true
             }
+            DispatchQueue.checkServerType(socket: self.socket,feedback: self.serverTypeFeedback)
         }
         else {
             self.activeAlert = .connectKO
