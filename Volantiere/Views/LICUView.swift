@@ -15,21 +15,41 @@ extension View {
 }
 #endif
 
+extension Binding {
+    func onChange(_ handler: @escaping () -> Void) -> Binding<Value> {
+        return Binding(
+            get: { self.wrappedValue },
+            set: { selection in
+                self.wrappedValue = selection
+                handler()
+        })
+    }
+}
 
 struct LicuView: View {
     
     var socket: TCPClient
     var messageHandler: MessageHandler
     
+    @State var isCanThreadOn: Bool = false
     @State var isHandBreakOn: Bool = true
-    @State var isKeyOn: Bool = false
+    @State var isKeyOn: Bool = true
     @State var isHeadLightsOn: Bool = false
     @State var speed: Double = 0
-    @State var currentGear: gear = .P
+    @State var currentGear: gear = .N
+    @State private var selectedCharisma = charisma.sport
     
     var body: some View {
         VStack {
-            // Stay active toggle
+            // Hand break toggle
+            HStack {
+                Spacer()
+                Toggle(isOn: $isCanThreadOn.didSet(execute: sendStartCanThread(toggle:))) {
+                    Text("CAN Active").italic().foregroundColor(Color("AccentColor")).fontWeight(.bold)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
+            }.padding()
+            // Hand break toggle
             HStack {
                 Spacer()
                 Toggle(isOn: $isHandBreakOn.didSet(execute: sendHBActive(isOn:))) {
@@ -89,6 +109,14 @@ struct LicuView: View {
             }
             .padding()
             .disabled(!self.isKeyOn)
+            // Charisma picker
+//            Picker("Charisma", selection: $selectedCharisma) {
+//                Text(charisma.strada.rawValue.uppercased())
+//                Text(charisma.sport.rawValue.uppercased())
+//                Text(charisma.corsa.rawValue.uppercased())
+//            }
+//            .padding()
+//            .pickerStyle(SegmentedPickerStyle())
             Spacer()
         }.onAppear(perform: setMessageHandler)
     }
@@ -167,6 +195,20 @@ struct LicuView: View {
         } else {
             addMessageToQueue(add: messages.LIGHT_OFF.rawValue)
         }
+    }
+    
+    func sendStartCanThread(toggle on: Bool) -> Void {
+        if on {
+            messageHandler.postMessage(messages.ACTIVE.rawValue)
+        }
+        else {
+            messageHandler.postMessage(messages.NOT_ACTIVE.rawValue)
+        }
+    }
+    
+    func onCharismaChanged() -> Void {
+        print("Charisma is \(selectedCharisma.rawValue)")
+        messageHandler.postMessage(messages.CHARISMA.rawValue + selectedCharisma.rawValue.uppercased())
     }
     
     func feedbackFromServer(received ok: String) -> Void {

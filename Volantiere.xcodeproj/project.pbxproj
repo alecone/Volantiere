@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8B4AC0B82606769D0081D271 /* LicuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4AC0B72606769D0081D271 /* LicuView.swift */; };
+		8B4AC0B82606769D0081D271 /* LICUView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4AC0B72606769D0081D271 /* LICUView.swift */; };
 		8B6A493B25E9A2F6004F8056 /* RecentRaspberries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */; };
-		8B6A493E25E9A598004F8056 /* NitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493D25E9A598004F8056 /* NitView.swift */; };
+		8B6A493E25E9A598004F8056 /* NITView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6A493D25E9A598004F8056 /* NITView.swift */; };
 		8B8FA0B525F2BA7200E2436F /* TextFieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */; };
 		8BA3DFA425F8302700AFD387 /* TCPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3DFA025F8302700AFD387 /* TCPClient.swift */; };
 		8BA3DFA525F8302700AFD387 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3DFA125F8302700AFD387 /* Result.swift */; };
@@ -26,9 +26,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		8B4AC0B72606769D0081D271 /* LicuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicuView.swift; sourceTree = "<group>"; };
+		8B4AC0B72606769D0081D271 /* LICUView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LICUView.swift; sourceTree = "<group>"; };
 		8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentRaspberries.swift; sourceTree = "<group>"; };
-		8B6A493D25E9A598004F8056 /* NitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NitView.swift; sourceTree = "<group>"; };
+		8B6A493D25E9A598004F8056 /* NITView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NITView.swift; sourceTree = "<group>"; };
 		8B8FA0B425F2BA7200E2436F /* TextFieldAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldAlert.swift; sourceTree = "<group>"; };
 		8BA3DFA025F8302700AFD387 /* TCPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCPClient.swift; sourceTree = "<group>"; };
 		8BA3DFA125F8302700AFD387 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
@@ -121,10 +121,10 @@
 			children = (
 				8BD164DA25E6FB0F006346B3 /* LogInView.swift */,
 				8B6A493A25E9A2F6004F8056 /* RecentRaspberries.swift */,
-				8B6A493D25E9A598004F8056 /* NitView.swift */,
+				8B6A493D25E9A598004F8056 /* NITView.swift */,
 				8BAD3BB325F03E3F0054D013 /* Navigator.swift */,
 				8BB26DFE25F40C7800A8BCE0 /* RaspberryRow.swift */,
-				8B4AC0B72606769D0081D271 /* LicuView.swift */,
+				8B4AC0B72606769D0081D271 /* LICUView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -203,10 +203,10 @@
 				8BAD3BB425F03E3F0054D013 /* Navigator.swift in Sources */,
 				8BB26DFF25F40C7800A8BCE0 /* RaspberryRow.swift in Sources */,
 				8BD164D725E6FA61006346B3 /* Raspberry.swift in Sources */,
-				8B6A493E25E9A598004F8056 /* NitView.swift in Sources */,
+				8B6A493E25E9A598004F8056 /* NITView.swift in Sources */,
 				8BA3DFA425F8302700AFD387 /* TCPClient.swift in Sources */,
 				8BD48AAC26079CAD00CBE562 /* Common.swift in Sources */,
-				8B4AC0B82606769D0081D271 /* LicuView.swift in Sources */,
+				8B4AC0B82606769D0081D271 /* LICUView.swift in Sources */,
 				8BA3DFA725F8302700AFD387 /* Socket.swift in Sources */,
 				8BD164DB25E6FB0F006346B3 /* LogInView.swift in Sources */,
 				8B6A493B25E9A2F6004F8056 /* RecentRaspberries.swift in Sources */,

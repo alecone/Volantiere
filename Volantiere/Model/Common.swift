@@ -18,6 +18,14 @@ enum volumeDirection {
     case mute
 }
 
+enum charisma: String, CaseIterable, Identifiable, Equatable {
+    case strada
+    case sport
+    case corsa
+
+    var id: String { self.rawValue }
+}
+
 enum messages: String {
     // Host type
     case HOST_REQ = "GETHOSTTYPE"
@@ -55,6 +63,7 @@ enum messages: String {
     case LIGHT_ON = "HL_ON"
     case LIGHT_OFF = "HL_OFF"
     case GEAR = "GEAR_"
+    case CHARISMA = "CHARISMA_"
 }
 enum gear {
     case R, P, N, One, Two, Three, Four, Five, Six, Seven
