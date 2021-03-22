@@ -174,11 +174,11 @@ final class MessageHandler {
     }
     
     func startThread() -> Void {
-        print("Starting sending dequeue")
         var toSend: String?
         var ok: Bool = false
         var feed: String = messages.NOK.rawValue
         DispatchQueue.global(qos: .background).async {
+            print("Starting sending dequeue thread")
             while !self.stop {
                 toSend = self.lastMessage
                 if toSend != nil {
@@ -213,6 +213,7 @@ final class MessageHandler {
                     Thread.sleep(forTimeInterval: 0.001)
                 }
             }
+            print("Stopped thread")
         }
     }
 }
